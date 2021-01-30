@@ -1,2 +1,2 @@
 # AkkaClusterScalaChat
-Вход в программу object Start
+Вход в программу : object Start
