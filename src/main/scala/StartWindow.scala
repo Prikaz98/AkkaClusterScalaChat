@@ -30,25 +30,22 @@ class StartWindow extends Application {
           Main.setName(nameField.getText)
         }
         if (pathValue(0) == "2551"){
-          Main.setPath("2551")
           primaryStage.close()
-          Main.setNum("app.conf")
+          Main.setPathAndNum("2551",1)
 
           Platform.setImplicitExit(false)
 
           startAnotherWindow()
         }else if (pathValue(0) == "2552"){
-          Main.setPath("2552")
           primaryStage.close()
-          Main.setNum("app1.conf")
-
+          Main.setPathAndNum("2552",2)
           Platform.setImplicitExit(false)
 
           startAnotherWindow()
         }else{
-          Main.setPath("2553")
           primaryStage.close()
-          Main.setNum("app2.conf")
+          Main.setPathAndNum("2553",3)
+
 
           Platform.setImplicitExit(false)
 

@@ -35,7 +35,7 @@ class Meeting(userName: String) extends Actor {
 
       Platform.runLater(new Runnable {
         override def run(): Unit =
-        ModelWindow.textArea.appendText(s"$localTime $from : $message \n")
+          CommonWindow.textArea.appendText(s"$localTime[Privat msg] $from : $message \n")
       })
 
 
@@ -46,7 +46,7 @@ class Meeting(userName: String) extends Actor {
 
       Platform.runLater(new Runnable() {
         override def run(): Unit = {
-          ModelWindow.textArea.appendText(s"$localTime $from : $message \n")
+          CommonWindow.textArea.appendText(s"$localTime[Privat msg] $from : $message \n")
         }
       })
   }

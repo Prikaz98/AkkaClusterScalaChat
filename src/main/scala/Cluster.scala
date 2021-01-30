@@ -1,8 +1,8 @@
-import Main.{myPath,meetingManager}
+import Main.{meetingManager, myPath}
 import akka.actor.{Actor, ActorLogging, ActorSystem, Props}
 import akka.cluster.Cluster
 import akka.cluster.ClusterEvent._
-import javafx.application.Application
+import com.typesafe.config.ConfigFactory
 
 class Cluster extends Actor with ActorLogging{
 
@@ -38,10 +38,41 @@ class Cluster extends Actor with ActorLogging{
 
 }
 object Main extends App{
-  val system = ActorSystem("system")
+  var name = getName
+  var path = getPath
+  var num = getNum
+
+  val config = ConfigFactory.load("app.conf")
+  val config1 = ConfigFactory.load("app1.conf")
+  val config2 = ConfigFactory.load("app2.conf")
+  var mainConf=config
+
+  if (num == 2 ) mainConf = config1
+  if (num == 3 ) mainConf = config2
+
+  val system = ActorSystem("system",mainConf)
   val cluster = system.actorOf(Props[Cluster],"cluster")
   val meetingManager = system.actorOf(Props[MeetingManager], "meetingManager")
-  val myPath = "akka://system@127.0.0.1:2552/user/meetingManager"
-  val name= "Vasya"
-  Application.launch(classOf[ClientWindowStart], args: _*)
+  val myPath = s"akka://system@127.0.0.1:$path/user/meetingManager"
+
+
+
+
+  def setName(name: String) = {
+    this.name = name
+  }
+  def getName():String= {
+  return name
+  }
+  def setPathAndNum(path:String, num: Int) ={
+    this.path = path
+    this.num = num
+  }
+  def getPath():String={
+  return path
+  }
+  def getNum():Int={
+    return num
+  }
+
 }

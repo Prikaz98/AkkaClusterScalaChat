@@ -1,4 +1,4 @@
-import ClientWindowStart.list
+import CommonWindow.users
 import Main.{myPath, name, system}
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import javafx.application.Platform
@@ -27,7 +27,7 @@ class MeetingManager extends Actor with ActorLogging{
         addressNick += (from -> username)
         meetings += (username -> session)
         Platform.runLater(new Runnable {
-          override def run(): Unit = list.add(username)
+          override def run(): Unit = users.add(username)
         })
       boolUserEntered = false
   }
@@ -36,7 +36,7 @@ class MeetingManager extends Actor with ActorLogging{
       addressNick -= (from)
       val nickName = addressNick(from)
       Platform.runLater(new Runnable {
-        override def run(): Unit = list.remove(nickName)
+        override def run(): Unit = users.remove(nickName)
       })
     case chatmsg@CommonChatMsg(from, massage)=>
       for(key <- meetings.keySet){
