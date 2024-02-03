@@ -5,19 +5,9 @@ import com.typesafe.config.{Config, ConfigFactory}
 import model.ChatModel
 
 case class Demon(name: String, port: String, model: ChatModel) {
+  System.setProperty("USER_CLUSTER_PORT", port)
 
-  private val mainConf: Config = port match {
-    case "2551" =>
-      ConfigFactory.load("app.conf")
-    case "2552" =>
-      ConfigFactory.load("app1.conf")
-    case "2553" =>
-      ConfigFactory.load("app2.conf")
-    case other =>
-      throw new IllegalArgumentException(
-        s"couldn't find fitted config by port $other"
-      )
-  }
+  private val mainConf: Config = ConfigFactory.load("app.conf")
 
   private val system: ActorSystem = ActorSystem("system", mainConf)
   val myPath = s"akka://system@127.0.0.1:$port/user/meetingManager"

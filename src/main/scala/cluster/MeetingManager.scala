@@ -6,7 +6,9 @@ import model.ChatModel
 
 import scala.collection.mutable.HashMap
 
-class MeetingManager(model : ChatModel, myPath : String, name: String) extends Actor with ActorLogging {
+class MeetingManager(model: ChatModel, myPath: String, name: String)
+    extends Actor
+    with ActorLogging {
 
   private val addressNick = new HashMap[String, String]
   private val meetings = new HashMap[String, ActorRef]
@@ -14,13 +16,12 @@ class MeetingManager(model : ChatModel, myPath : String, name: String) extends A
   addressNick += (myPath -> name)
   meetings += (name -> meeting)
 
-
   override def receive: Receive = {
 
     case RequestNameSession(from) =>
       this.context.system.actorSelection(from) ! SendRequestNameSession(from)
     case SendRequestNameSession(from) =>
-    sender() ! RemoteLogin(from, name, meeting)
+      sender() ! RemoteLogin(from, name, meeting)
     case RemoteLogin(from, username, session) =>
       log.info(s"$username login")
       var boolUserEntered: Boolean = false
@@ -29,24 +30,28 @@ class MeetingManager(model : ChatModel, myPath : String, name: String) extends A
         addressNick += (from -> username)
         meetings += (username -> session)
         Platform.runLater(() => model.users.add(username))
-      boolUserEntered = false
-  }
+        boolUserEntered = false
+      }
+
     case RemoteLogout(from) =>
-      meetings -= (addressNick(from))
-      addressNick -= (from)
+      meetings -= addressNick(from)
+      addressNick -= from
       val nickName = addressNick(from)
       Platform.runLater(() => model.users.remove(nickName))
-    case chatmsg@CommonChatMsg(from, massage)=>
-      for(key <- meetings.keySet){
+
+    case chatmsg @ CommonChatMsg(from, massage) =>
+      for (key <- meetings.keySet) {
         meetings(key) ! chatmsg
       }
-    case chatmsg@PrivateChatMsg(from, to, message) =>
+
+    case chatmsg @ PrivateChatMsg(from, to, message) =>
       meetings(to) ! chatmsg
-    case chatmsg@SelfPrivateChatMsg(from, to, message) =>
+
+    case chatmsg @ SelfPrivateChatMsg(from, to, message) =>
       meetings(from) ! chatmsg
+
   }
 }
-
 
 case class RequestNameSession(from: String)
 case class SendRequestNameSession(from: String)

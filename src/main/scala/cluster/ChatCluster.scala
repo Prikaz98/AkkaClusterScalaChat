@@ -13,7 +13,7 @@ class ChatCluster(myPath : String, meetingManager : ActorRef) extends Actor with
       classOf[UnreachableMember])
   }
 
-  override def postStop(): Unit = cluster.unsubscribe(self)
+  override def postStop: Unit = cluster.unsubscribe(self)
 
   override def receive: Receive = {
     case MemberUp(member) =>
@@ -28,8 +28,10 @@ class ChatCluster(myPath : String, meetingManager : ActorRef) extends Actor with
       val actorPath = member.address + "/user/meetingManager"
       meetingManager ! RemoteLogout(actorPath)
 
-    case MemberRemoved(member, prevStatus) =>
+    case MemberRemoved(member, _) =>
       log.info(s"Listener node is removed: $member")
+      val actorPath = member.address + "/user/meetingManager"
+      meetingManager ! RemoteLogout(actorPath)
 
     case ev: MemberEvent =>
       log.info(s"Listener event: $ev")
