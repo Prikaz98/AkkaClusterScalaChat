@@ -22,7 +22,7 @@ class MeetingManager(model : ChatModel, myPath : String, name: String) extends A
     case SendRequestNameSession(from) =>
     sender() ! RemoteLogin(from, name, meeting)
     case RemoteLogin(from, username, session) =>
-      println(s"$username login")
+      log.info(s"$username login")
       var boolUserEntered: Boolean = false
       for (key <- meetings.keySet if key == username) boolUserEntered = true
       if (boolUserEntered == false) {

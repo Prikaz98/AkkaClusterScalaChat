@@ -10,6 +10,7 @@ import javafx.scene.image.Image
 import javafx.scene.layout.GridPane
 import javafx.stage.Stage
 import model.ChatModel
+import model.ChatModel.commonRoom
 
 
 class CommonWindow(name : String, meetingManager: ActorRef, model : ChatModel) {
@@ -17,12 +18,11 @@ class CommonWindow(name : String, meetingManager: ActorRef, model : ChatModel) {
   def start(): Unit = {
     val textArea = new TextArea()
     val textField = new TextField()
-    var userName = name
+    /* target of a message */
+    var selectedUserName = name
     val usersListView = new ListView[String](model.users)
 
     model.newMessage.addListener((_, _, newValue) => textArea.appendText(newValue))
-
-    model.users.add(name)
     val primaryStage = new Stage()
     val grid = new GridPane
     grid.setAlignment(Pos.CENTER)
@@ -33,18 +33,19 @@ class CommonWindow(name : String, meetingManager: ActorRef, model : ChatModel) {
     usersListView
       .getSelectionModel
       .selectedItemProperty
-      .addListener((_,_, newValue) => userName = newValue)
+      .addListener((_,_, newValue) => selectedUserName = newValue)
 
-    textField.setOnAction((_: ActionEvent) => {
-      if (userName != name && userName != "Common room") {
-        meetingManager ! PrivateChatMsg(name, userName, textField.getText)
-        meetingManager ! SelfPrivateChatMsg(name, userName, textField.getText)
-        textField.setText(null)
-      }
-      if (userName == "Common room") {
-        meetingManager ! CommonChatMsg(name, textField.getText)
-        textField.setText(null)
-      }
+    textField.setOnAction(
+        (_: ActionEvent) => {
+            selectedUserName match {
+                case _ if selectedUserName != name && selectedUserName != commonRoom =>
+                    meetingManager ! PrivateChatMsg(name, selectedUserName, textField.getText)
+                    meetingManager ! SelfPrivateChatMsg(name, selectedUserName, textField.getText)
+                case _ if selectedUserName == commonRoom =>
+                    meetingManager ! CommonChatMsg(name, textField.getText)
+            }
+
+            textField.setText(null)
     })
 
 
@@ -58,7 +59,7 @@ class CommonWindow(name : String, meetingManager: ActorRef, model : ChatModel) {
 
     grid.add(textField, 1, 4)
     primaryStage.getIcons.add(new Image("icon.png"))
-    primaryStage.setTitle("Chat")
+    primaryStage.setTitle(name)
     val scene = new Scene(grid, 740, 510)
     primaryStage.setScene(scene)
     primaryStage.show()

@@ -15,8 +15,7 @@ class ChatCluster(myPath : String, meetingManager : ActorRef) extends Actor with
 
   override def postStop(): Unit = cluster.unsubscribe(self)
 
-
-  override def receive: Receive =  {
+  override def receive: Receive = {
     case MemberUp(member) =>
       log.info(s"Listener node is up: $member")
       if (member.address + "/user/meetingManager" != myPath) {
