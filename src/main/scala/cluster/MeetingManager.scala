@@ -1,14 +1,16 @@
-import CommonWindow.users
-import Main.{myPath, name, system}
+package cluster
+
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import javafx.application.Platform
+import model.ChatModel
 
 import scala.collection.mutable.HashMap
 
-class MeetingManager extends Actor with ActorLogging{
-  val addressNick = new HashMap[String, String]
-  val meetings = new HashMap[String, ActorRef]
-  val meeting = system.actorOf(Props(new Meeting(name)))
+class MeetingManager(model : ChatModel, myPath : String, name: String) extends Actor with ActorLogging {
+
+  private val addressNick = new HashMap[String, String]
+  private val meetings = new HashMap[String, ActorRef]
+  private val meeting = this.context.system.actorOf(Props(new Meeting(model)))
   addressNick += (myPath -> name)
   meetings += (name -> meeting)
 
@@ -16,7 +18,7 @@ class MeetingManager extends Actor with ActorLogging{
   override def receive: Receive = {
 
     case RequestNameSession(from) =>
-      system.actorSelection(from) ! SendRequestNameSession(from)
+      this.context.system.actorSelection(from) ! SendRequestNameSession(from)
     case SendRequestNameSession(from) =>
     sender() ! RemoteLogin(from, name, meeting)
     case RemoteLogin(from, username, session) =>
@@ -26,18 +28,14 @@ class MeetingManager extends Actor with ActorLogging{
       if (boolUserEntered == false) {
         addressNick += (from -> username)
         meetings += (username -> session)
-        Platform.runLater(new Runnable {
-          override def run(): Unit = users.add(username)
-        })
+        Platform.runLater(() => model.users.add(username))
       boolUserEntered = false
   }
     case RemoteLogout(from) =>
       meetings -= (addressNick(from))
       addressNick -= (from)
       val nickName = addressNick(from)
-      Platform.runLater(new Runnable {
-        override def run(): Unit = users.remove(nickName)
-      })
+      Platform.runLater(() => model.users.remove(nickName))
     case chatmsg@CommonChatMsg(from, massage)=>
       for(key <- meetings.keySet){
         meetings(key) ! chatmsg

@@ -1,52 +1,41 @@
-import java.time.LocalDateTime
+package cluster
 
 import akka.actor.Actor
 import javafx.application.Platform
+import model.ChatModel
 
-class Meeting(userName: String) extends Actor {
-  def getLocalTime:String ={
+import java.time.LocalDateTime
+
+class Meeting(model: ChatModel) extends Actor {
+
+  private def getLocalTime : String = {
     val hour = LocalDateTime.now().getHour
     val minute = LocalDateTime.now().getMinute
     val localDateTime = s"[$hour:$minute]"
-    return localDateTime
+    localDateTime
   }
 
 
-
   override def receive: Receive = {
-
-
-
     case CommonChatMsg (from, message) =>
-
       val localTime = getLocalTime
-
       Platform.runLater(new Runnable() {
         override def run(): Unit = {
-          CommonWindow.textArea.appendText(s"$localTime $from : $message \n")
+          model.newMessage.set(s"$localTime $from : $message \n")
         }
       })
 
 
-
     case PrivateChatMsg(from,to, message)=>
-
       val localTime = getLocalTime
-
-      Platform.runLater(new Runnable {
-        override def run(): Unit =
-          CommonWindow.textArea.appendText(s"$localTime[Privat msg] $from : $message \n")
-      })
+      Platform.runLater(() => model.newMessage.set(s"$localTime[Privat msg] $from : $message \n"))
 
 
-
-    case SelfPrivateChatMsg(from, to, message) =>
-
+    case SelfPrivateChatMsg(from, _, message) =>
       val localTime = getLocalTime
-
       Platform.runLater(new Runnable() {
         override def run(): Unit = {
-          CommonWindow.textArea.appendText(s"$localTime[Privat msg] $from : $message \n")
+          model.newMessage.set(s"$localTime[Privat msg] $from : $message \n")
         }
       })
   }

@@ -1,6 +1,6 @@
 import javafx.application.Application
+import ui.StartWindow
 
-object Start extends App{
+object Launcher extends App {
   Application.launch(classOf[StartWindow], args: _*)
-
 }
