@@ -19,11 +19,7 @@ class Meeting(model: ChatModel) extends Actor {
   override def receive: Receive = {
     case CommonChatMsg (from, message) =>
       val localTime = getLocalTime
-      Platform.runLater(new Runnable() {
-        override def run(): Unit = {
-          model.newMessage.set(s"$localTime $from : $message \n")
-        }
-      })
+      Platform.runLater(() => model.newMessage.set(s"$localTime $from : $message \n"))
 
 
     case PrivateChatMsg(from,to, message)=>
