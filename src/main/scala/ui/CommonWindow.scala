@@ -12,8 +12,7 @@ import javafx.stage.Stage
 import model.ChatModel
 import model.ChatModel.commonRoom
 
-
-class CommonWindow(name : String, meetingManager: ActorRef, model : ChatModel) {
+class CommonWindow(name: String, meetingManager: ActorRef, model: ChatModel) {
 
   def start(): Unit = {
     val textArea = new TextArea()
@@ -22,7 +21,9 @@ class CommonWindow(name : String, meetingManager: ActorRef, model : ChatModel) {
     var selectedUserName = name
     val usersListView = new ListView[String](model.users)
 
-    model.newMessage.addListener((_, _, newValue) => textArea.appendText(newValue))
+    model.newMessage.addListener((_, _, newValue) =>
+      textArea.appendText(newValue)
+    )
     val primaryStage = new Stage()
     val grid = new GridPane
     grid.setAlignment(Pos.CENTER)
@@ -30,24 +31,28 @@ class CommonWindow(name : String, meetingManager: ActorRef, model : ChatModel) {
     grid.setVgap(10)
     grid.setPadding(new Insets(25, 25, 25, 25))
 
-    usersListView
-      .getSelectionModel
-      .selectedItemProperty
-      .addListener((_,_, newValue) => selectedUserName = newValue)
+    usersListView.getSelectionModel.selectedItemProperty
+      .addListener((_, _, newValue) => selectedUserName = newValue)
 
-    textField.setOnAction(
-        (_: ActionEvent) => {
-            selectedUserName match {
-                case _ if selectedUserName != name && selectedUserName != commonRoom =>
-                    meetingManager ! PrivateChatMsg(name, selectedUserName, textField.getText)
-                    meetingManager ! SelfPrivateChatMsg(name, selectedUserName, textField.getText)
-                case _ if selectedUserName == commonRoom =>
-                    meetingManager ! CommonChatMsg(name, textField.getText)
-            }
+    textField.setOnAction((_: ActionEvent) => {
+      selectedUserName match {
+        case _ if selectedUserName != name && selectedUserName != commonRoom =>
+          meetingManager ! PrivateChatMsg(
+            name,
+            selectedUserName,
+            textField.getText
+          )
+          meetingManager ! SelfPrivateChatMsg(
+            name,
+            selectedUserName,
+            textField.getText
+          )
+        case _ if selectedUserName == commonRoom =>
+          meetingManager ! CommonChatMsg(name, textField.getText)
+      }
 
-            textField.setText(null)
+      textField.setText(null)
     })
-
 
     grid.add(usersListView, 0, 3)
 

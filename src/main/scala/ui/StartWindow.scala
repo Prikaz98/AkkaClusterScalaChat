@@ -11,6 +11,9 @@ import javafx.scene.image.Image
 import javafx.scene.layout.GridPane
 import javafx.stage.Stage
 import model.ChatModel
+import javafx.scene.control.Alert
+import javafx.scene.control.Alert.AlertType
+import javafx.scene.control.ButtonType
 
 class StartWindow extends Application {
 
@@ -28,7 +31,7 @@ class StartWindow extends Application {
     val listPath = FXCollections.observableArrayList("2551", "2552", "2553")
     val listView = new ListView[String](listPath)
     var port = "2551"
-    val btn = new Button("ОК")
+    val okBtn = new Button("ОК")
     val scene = new Scene(grid, 300, 300)
 
     grid.setAlignment(Pos.CENTER)
@@ -41,11 +44,17 @@ class StartWindow extends Application {
       .selectedItemProperty()
       .addListener((_, _, newValue) => port = newValue)
 
-    btn.setOnAction((_: ActionEvent) => initializeChatWindow(primaryStage, nameField, port))
+    okBtn.setOnAction((_: ActionEvent) =>
+      if (nameField.getText() == null || nameField.getText().isEmpty()) {
+        error("Name field is empty")
+      } else {
+        initializeChatWindow(primaryStage, nameField, port)
+      }
+    )
 
     grid.add(nameField, 0, 0)
     grid.add(listView, 0, 1)
-    grid.add(btn, 0, 2)
+    grid.add(okBtn, 0, 2)
 
     primaryStage.setTitle("Selection Window")
     primaryStage.centerOnScreen()
@@ -54,13 +63,20 @@ class StartWindow extends Application {
     primaryStage.show()
   }
 
-  private def initializeChatWindow(primaryStage: Stage, nameField: TextArea, pathValue: String): Unit = {
+  private def initializeChatWindow(
+      primaryStage: Stage,
+      nameField: TextArea,
+      pathValue: String
+  ): Unit = {
     val name = nameField.getText
     val model = new ChatModel()
     primaryStage.close()
     Platform.setImplicitExit(false)
     startAnotherWindow(Demon(name, pathValue, model))
   }
+
+  private def error(errorMsg: String): Unit =
+    new Alert(AlertType.ERROR, errorMsg, ButtonType.OK).show()
 
   override def stop(): Unit = System.exit(0)
 

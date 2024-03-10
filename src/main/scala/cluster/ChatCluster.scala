@@ -3,38 +3,44 @@ package cluster
 import akka.actor.{Actor, ActorLogging, ActorRef}
 import akka.cluster.Cluster
 import akka.cluster.ClusterEvent._
+import akka.cluster.Member
 
-class ChatCluster(myPath : String, meetingManager : ActorRef) extends Actor with ActorLogging {
+class ChatCluster(myPath: String, meetingManager: ActorRef)
+    extends Actor
+    with ActorLogging {
 
   private val cluster = Cluster(context.system)
 
   override def preStart(): Unit = {
-    cluster.subscribe(self, InitialStateAsEvents, classOf[MemberEvent],
-      classOf[UnreachableMember])
+    cluster.subscribe(
+      self,
+      InitialStateAsEvents,
+      classOf[MemberEvent],
+      classOf[UnreachableMember]
+    )
   }
 
-  override def postStop: Unit = cluster.unsubscribe(self)
+  override def postStop(): Unit = cluster.unsubscribe(self)
 
   override def receive: Receive = {
     case MemberUp(member) =>
       log.info(s"Listener node is up: $member")
-      if (member.address + "/user/meetingManager" != myPath) {
-        val actorPath = member.address + "/user/meetingManager"
-        meetingManager ! RequestNameSession(actorPath)
+      if (actorPath(member) != myPath) {
+        meetingManager ! RequestNameSession(actorPath(member))
       }
 
     case UnreachableMember(member) =>
       log.info(s"Listener node is unreachable: $member")
-      val actorPath = member.address + "/user/meetingManager"
-      meetingManager ! RemoteLogout(actorPath)
+      meetingManager ! RemoteLogout(actorPath(member))
 
     case MemberRemoved(member, _) =>
       log.info(s"Listener node is removed: $member")
-      val actorPath = member.address + "/user/meetingManager"
-      meetingManager ! RemoteLogout(actorPath)
+      meetingManager ! RemoteLogout(actorPath(member))
 
     case ev: MemberEvent =>
       log.info(s"Listener event: $ev")
   }
+
+  def actorPath(member: Member): String = s"${member.address.toString}/user/meetingManager"
 
 }
