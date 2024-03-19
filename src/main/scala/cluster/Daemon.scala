@@ -4,7 +4,7 @@ import akka.actor.{ActorRef, ActorSystem, Props}
 import com.typesafe.config.{Config, ConfigFactory}
 import model.ChatModel
 
-case class Demon(name: String, port: String, model: ChatModel) {
+case class Daemon(name: String, port: String, model: ChatModel) {
   System.setProperty("USER_CLUSTER_PORT", port)
 
   private val mainConf: Config = ConfigFactory.load("app.conf")

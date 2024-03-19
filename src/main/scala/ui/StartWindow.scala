@@ -1,6 +1,6 @@
 package ui
 
-import cluster.Demon
+import cluster.Daemon
 import javafx.application.{Application, Platform}
 import javafx.collections.FXCollections
 import javafx.event.ActionEvent
@@ -17,7 +17,7 @@ import javafx.scene.control.ButtonType
 
 class StartWindow extends Application {
 
-  private def startAnotherWindow(main: Demon): Unit = {
+  private def startAnotherWindow(main: Daemon): Unit = {
     val window = new CommonWindow(main.name, main.meetingManager, main.model)
     window.start()
     Platform.setImplicitExit(true)
@@ -74,7 +74,7 @@ class StartWindow extends Application {
     val model = new ChatModel()
     primaryStage.close()
     Platform.setImplicitExit(false)
-    startAnotherWindow(Demon(name, pathValue, model))
+    startAnotherWindow(Daemon(name, pathValue, model))
   }
 
   private def error(errorMsg: String): Unit =
