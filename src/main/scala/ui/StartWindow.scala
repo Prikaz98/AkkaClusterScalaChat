@@ -39,10 +39,12 @@ class StartWindow extends Application {
     grid.setHgap(10)
     grid.setVgap(10)
     grid.setPadding(new Insets(25, 25, 25, 25))
-    val selectModel = listView.getSelectionModel
-    selectModel
+
+    listView.getSelectionModel
       .selectedItemProperty()
       .addListener((_, _, newValue) => port = newValue)
+
+    listView.getSelectionModel().selectFirst()
 
     okBtn.setOnAction((_: ActionEvent) =>
       if (nameField.getText() == null || nameField.getText().isEmpty()) {

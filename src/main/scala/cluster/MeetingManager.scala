@@ -35,8 +35,8 @@ class MeetingManager(model: ChatModel, myPath: String, name: String)
 
     case RemoteLogout(from) =>
       meetings -= addressNick(from)
-      addressNick -= from
       val nickName = addressNick(from)
+      addressNick -= from
       Platform.runLater(() => model.users.remove(nickName))
 
     case chatmsg @ CommonChatMsg(from, massage) =>

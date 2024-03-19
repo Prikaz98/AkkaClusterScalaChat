@@ -17,8 +17,6 @@ class CommonWindow(name: String, meetingManager: ActorRef, model: ChatModel) {
   def start(): Unit = {
     val textArea = new TextArea()
     val textField = new TextField()
-    /* target of a message */
-    var selectedUserName = name
     val usersListView = new ListView[String](model.users)
 
     model.newMessage.addListener((_, _, newValue) =>
@@ -32,27 +30,12 @@ class CommonWindow(name: String, meetingManager: ActorRef, model: ChatModel) {
     grid.setPadding(new Insets(25, 25, 25, 25))
 
     usersListView.getSelectionModel.selectedItemProperty
-      .addListener((_, _, newValue) => selectedUserName = newValue)
 
-    textField.setOnAction((_: ActionEvent) => {
-      selectedUserName match {
-        case _ if selectedUserName != name && selectedUserName != commonRoom =>
-          meetingManager ! PrivateChatMsg(
-            name,
-            selectedUserName,
-            textField.getText
-          )
-          meetingManager ! SelfPrivateChatMsg(
-            name,
-            selectedUserName,
-            textField.getText
-          )
-        case _ if selectedUserName == commonRoom =>
-          meetingManager ! CommonChatMsg(name, textField.getText)
-      }
-
+    textField.setOnAction { (_: ActionEvent) =>
+      val selectedUserName = usersListView.getSelectionModel().getSelectedItem()
+      sendMessage(selectedUserName, textField.getText())
       textField.setText(null)
-    })
+    }
 
     grid.add(usersListView, 0, 3)
 
@@ -68,6 +51,24 @@ class CommonWindow(name: String, meetingManager: ActorRef, model: ChatModel) {
     val scene = new Scene(grid, 740, 510)
     primaryStage.setScene(scene)
     primaryStage.show()
+  }
+
+  private def sendMessage(destination: String, msg: String): Unit = {
+    destination match {
+      case _ if destination != name && destination != commonRoom =>
+        meetingManager ! PrivateChatMsg(
+          from = name,
+          to = destination,
+          message = msg
+        )
+        meetingManager ! SelfPrivateChatMsg(
+          from = name,
+          to = destination,
+          message = msg
+        )
+      case _ if destination == commonRoom =>
+        meetingManager ! CommonChatMsg(from = name, message = msg)
+    }
   }
 
 }
