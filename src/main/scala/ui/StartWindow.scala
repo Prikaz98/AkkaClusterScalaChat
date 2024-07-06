@@ -6,14 +6,12 @@ import javafx.collections.FXCollections
 import javafx.event.ActionEvent
 import javafx.geometry.{Insets, Pos}
 import javafx.scene.Scene
-import javafx.scene.control.{Button, ListView, TextArea}
+import javafx.scene.control.Alert.AlertType
+import javafx.scene.control.{Alert, Button, ListView, TextArea, ButtonType}
 import javafx.scene.image.Image
 import javafx.scene.layout.GridPane
 import javafx.stage.Stage
 import model.ChatModel
-import javafx.scene.control.Alert
-import javafx.scene.control.Alert.AlertType
-import javafx.scene.control.ButtonType
 
 class StartWindow extends Application {
 
@@ -47,10 +45,11 @@ class StartWindow extends Application {
     listView.getSelectionModel().selectFirst()
 
     okBtn.setOnAction((_: ActionEvent) =>
-      if (nameField.getText() == null || nameField.getText().isEmpty()) {
-        error("Name field is empty")
-      } else {
-        initializeChatWindow(primaryStage, nameField, port)
+      Option(nameField.getText()) match {
+        case Some(name) if !name.isBlank =>
+          initializeChatWindow(primaryStage, nameField, port)
+        case _ =>
+          error("Name field is empty")
       }
     )
 

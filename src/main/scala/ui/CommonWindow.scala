@@ -19,9 +19,10 @@ class CommonWindow(name: String, meetingManager: ActorRef, model: ChatModel) {
     val textField = new TextField()
     val usersListView = new ListView[String](model.users)
 
-    model.newMessage.addListener((_, _, newValue) =>
-      textArea.appendText(newValue)
-    )
+    model
+      .newMessage
+      .addListener((_, _, newValue) => textArea.appendText(newValue))
+
     val primaryStage = new Stage()
     val grid = new GridPane
     grid.setAlignment(Pos.CENTER)

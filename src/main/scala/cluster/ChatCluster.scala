@@ -1,9 +1,8 @@
 package cluster
 
 import akka.actor.{Actor, ActorLogging, ActorRef}
-import akka.cluster.Cluster
 import akka.cluster.ClusterEvent._
-import akka.cluster.Member
+import akka.cluster.{Cluster, Member}
 
 class ChatCluster(myPath: String, meetingManager: ActorRef)
     extends Actor
