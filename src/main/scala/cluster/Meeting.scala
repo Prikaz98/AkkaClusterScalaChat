@@ -8,30 +8,29 @@ import java.time.LocalDateTime
 
 class Meeting(model: ChatModel) extends Actor {
 
-  private def getLocalTime: String = {
-    val hour = LocalDateTime.now().getHour
-    val minute = LocalDateTime.now().getMinute
-    val localDateTime = s"[$hour:$minute]"
-    localDateTime
+  private def now: String = {
+    val now = LocalDateTime.now()
+    val hour = now.getHour
+    val minute = now.getMinute
+    s"[$hour:$minute]"
   }
 
   override def receive: Receive = {
     case CommonChatMsg(from, message) =>
-      val localTime = getLocalTime
       Platform.runLater(() =>
-        model.newMessage.set(s"$localTime $from : $message \n")
+        model.newMessage.set(s"$now $from : $message \n")
       )
 
     case PrivateChatMsg(from, to, message) =>
-      val localTime = getLocalTime
+      val localTime = now
       Platform.runLater(() =>
-        model.newMessage.set(s"$localTime[Privat msg] $from : $message \n")
+        model.newMessage.set(s"$now[Privat msg] $from : $message \n")
       )
 
     case SelfPrivateChatMsg(from, _, message) =>
-      val localTime = getLocalTime
+      val localTime = now
       Platform.runLater(() =>
-        model.newMessage.set(s"$localTime[Privat msg] $from : $message \n")
+        model.newMessage.set(s"$now[Privat msg] $from : $message \n")
       )
   }
 }
