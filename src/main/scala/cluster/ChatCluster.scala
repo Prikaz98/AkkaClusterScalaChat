@@ -38,6 +38,7 @@ class ChatCluster(myPath: String, meetingManager: ActorRef)
 
     case ev: MemberEvent =>
       log.info(s"Listener event: $ev")
+
   }
 
   def actorPath(member: Member): String = s"${member.address.toString}/user/meetingManager"

@@ -7,7 +7,7 @@ import javafx.event.ActionEvent
 import javafx.geometry.{Insets, Pos}
 import javafx.scene.Scene
 import javafx.scene.control.Alert.AlertType
-import javafx.scene.control.{Alert, Button, ListView, TextArea, ButtonType}
+import javafx.scene.control.{Alert, Button, ButtonType, ListView, TextArea}
 import javafx.scene.image.Image
 import javafx.scene.layout.GridPane
 import javafx.stage.Stage
@@ -76,8 +76,7 @@ class StartWindow extends Application {
     startAnotherWindow(Daemon(name, pathValue, model))
   }
 
-  private def error(errorMsg: String): Unit =
-    new Alert(AlertType.ERROR, errorMsg, ButtonType.OK).show()
+  private def error(errorMsg: String): Unit = new Alert(AlertType.ERROR, errorMsg, ButtonType.OK).show()
 
   override def stop(): Unit = System.exit(0)
 
